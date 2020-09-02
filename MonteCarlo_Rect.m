@@ -313,17 +313,17 @@ function MonteCarlo_Rect(varargin)
         photons_deep_r_hist = photons_deep_r_hist./(repmat((2*[1:1:(length(r_grid)-1)]-1),numel(hist_grid) - 1,1))';
     end
     
-%     if is_calculate_absorption_map & with_air
-%         a = find(z_grid == 1);
-%         absorption_map = absorption_map(:,:,a:end);
-%         z_grid = 0:dz:(max_z-1);
-%     end
-%     
-%     if is_calculate_irradiance & with_air
-%         a = find(z_grid == 1);
-%         irradiance = irradiance(:,:,a:end);
-%         z_grid = 0:dz:(max_z-1);
-%     end
+    if is_calculate_absorption_map & with_air
+        a = find(z_grid == 1);
+        absorption_map = absorption_map(:,:,a:end);
+        z_grid = 0:dz:(max_z-1);
+    end
+    
+    if is_calculate_irradiance & with_air
+        a = find(z_grid == 1);
+        irradiance = irradiance(:,:,a:end);
+        z_grid = 0:dz:(max_z-1);
+    end
     
     if is_calculate_TR
         T = transmit_weight/total_photons
