@@ -31,6 +31,7 @@ function params = set_default_parameters()
     params.with_air = false;
     params.is_calculate_absorption_map = false;
     params.is_show_absorption_map = false; 
+    params.is_show_absorption_map = false;
     params.with_PS = false;
     params.wavelenght = 405;
     
@@ -43,6 +44,7 @@ function params = set_default_parameters()
     params.c = 1;
     params.d = 1;
     params.is_het = false;
+    params.het_cylinder = false;
     params.ma_het = 0.2;
     params.ms_het = 1;
     params.g_het = 0.9;
