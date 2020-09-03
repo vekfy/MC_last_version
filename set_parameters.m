@@ -9,11 +9,9 @@ function params = set_parameters(varargin)
     for i=1:2:nargin,
         params.(varargin{i}) = varargin{i+1};
     end
-    if params.with_air
-        params.n = [params.n_out(1), params.n_air,params.n_in, params.n_out(2)];
-    else
-         params.n = [params.n_out(1), params.n_in, params.n_out(2)];
-    end 
+    
+    params.n = [params.n_out(1), params.n_in, params.n_out(2)];
+
     
     check_parameters(params);
 end
@@ -28,7 +26,6 @@ function params = set_default_parameters()
     params.is_calculate_TR = false;
     params.result_filename = 'MC.mat';
     params.is_complex_detector = false;
-    params.with_air = false;
     params.is_calculate_absorption_map = false;
     params.is_show_absorption_map = false; 
     params.is_show_absorption_map = false;
@@ -61,7 +58,7 @@ function params = set_default_parameters()
     params.x = 10; %mm
     params.y = 10; %mm
     params.z = [0 5];  %mm     
-    params.z_air = [0 1];
+
     
     %fluorescence 
     params.is_fluor = false;
@@ -71,7 +68,7 @@ function params = set_default_parameters()
     params.g = [0.7];           
     params.n_in = 1.33;        
     params.n_out = [1 1];        
-    params.n_air = 1;
+
     
     params.dx = 0.05;           
     params.dy = 0.05;           

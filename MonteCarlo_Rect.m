@@ -10,7 +10,6 @@ function MonteCarlo_Rect(varargin)
     result_filename = params.result_filename;
     is_complex_detector = params.is_complex_detector;
     is_circle = params.is_circle;
-    with_air = params.with_air;
     with_PS  = params.with_PS;
     is_calculate_absorption_map = params.is_calculate_absorption_map;
     is_show_absorption_map = params.is_show_absorption_map;
@@ -36,20 +35,13 @@ function MonteCarlo_Rect(varargin)
     
 
    %% Tissue parameters
-   
-   if with_air
-    z = unique([params.z_air params.z+1]);
-    min_z = z(2);
-    ma =[0 params.ma];    
-    ms =[0 params.ms];   
-    g = [1 params.g];
-   else
+
     z = params.z;
     min_z = min(z);
     ma =params.ma;    
     ms =params.ms;   
     g = params.g; 
-   end
+
     n = params.n;
     max_z = max(z);
     
@@ -187,16 +179,15 @@ function MonteCarlo_Rect(varargin)
         [pos, dir, layer, is_need_recalculation] = reflect_photons(pos, pos_previous, dir, layer, z, n, use_gpu);
 
         if is_calculate_irradiance
-            if with_air
-                in = pos(:,1) >= 0 & pos(:,2) >= 0 & pos(:,3) >1 & pos(:,1) <= x & pos(:,2) <= y & pos(:,3) <= max_z;
-            else
-                in = pos(:,1) >= 0 & pos(:,2) >= 0 & pos(:,3) >=0 & pos(:,1) <= x & pos(:,2) <= y & pos(:,3) <= max_z;
-            end
-            count = in&(is_need_recalculation);
+            
+            in = pos(:,1) >= 0 & pos(:,2) >= 0 & pos(:,3) >=0 & pos(:,1) <= x & pos(:,2) <= y & pos(:,3) <= max_z;
+            
+            %count = in&(is_need_recalculation);
+            count = in;
             if use_gpu
                 irradiance = calculate_irradiance_simple_gpu(pos_previous(count,:), pos(count,:), weight(count), x_grid, y_grid, z_grid, irradiance);
             else
-                irradiance = calculate_irradiance_simple(pos_previous(count,:), pos(count,:), weight(count), x_grid, y_grid, z_grid, irradiance);
+                irradiance = calculate_irradiance_simpleMK(pos_previous(count,:), pos(count,:), weight(count), x_grid, y_grid, z_grid, irradiance);
             end
             if is_show_irradiance 
                 figure(1)
@@ -214,11 +205,8 @@ function MonteCarlo_Rect(varargin)
         end
        
         if is_calculate_histograms
-            if with_air
-               detected_photons = find(layer <=1);
-            else
-               detected_photons = find(layer <=0);
-            end
+            detected_photons = find(layer <=0);
+
             if numel(detected_photons) > 0 
                 photons_deep_hist = photons_histograms(photons_deep_hist, x_grid, y_grid, hist_grid, pos(detected_photons,:), max_deep(detected_photons,:), weight(detected_photons));
 				photons_deep_r_hist = photons_histograms_r(photons_deep_r_hist,source_center, r_grid, hist_grid, pos(detected_photons,:), max_deep(detected_photons,:), weight(detected_photons));
@@ -233,11 +221,9 @@ function MonteCarlo_Rect(varargin)
         if is_calculate_TR
             transmit_escaped = layer == numel(z);
             transmit_weight = transmit_weight + get_diffuse_weight(pos(transmit_escaped,:), weight(transmit_escaped),source_center,T_radius);
-            if with_air 
-               reflect_escaped = layer == 1;
-            else
-               reflect_escaped = layer == 0;
-            end
+            
+            reflect_escaped = layer == 0;
+
             sum_ref = sum_ref + sum(reflect_escaped);
             reflect_weight = reflect_weight + get_diffuse_weight(pos(reflect_escaped,:), weight(reflect_escaped),source_center,R_radius);
         end
@@ -246,11 +232,9 @@ function MonteCarlo_Rect(varargin)
         for i = 1:numel(z)
             on =on + (pos(:,3) == z(i));
         end
-        if with_air
-           out = pos(:,1) < 0 | pos(:,2) < 0 | pos(:,1) > x | pos(:,2) > y | layer <=1 | layer >= numel(z); 
-        else
-           out = pos(:,1) < 0 | pos(:,2) < 0 | pos(:,1) > x | pos(:,2) > y | layer <=0 | layer >= numel(z); 
-        end
+
+        out = pos(:,1) < 0 | pos(:,2) < 0 | pos(:,1) > x | pos(:,2) > y | layer <=0 | layer >= numel(z); 
+
         outside = outside+ sum(pos(:,1) < 0 | pos(:,2) < 0 | pos(:,1) > x | pos(:,2) > y );
         outside_weight = outside_weight + sum(weight(pos(:,1) < 0 | pos(:,2) < 0 | pos(:,1) > x | pos(:,2) > y ));
 
@@ -313,17 +297,6 @@ function MonteCarlo_Rect(varargin)
         photons_deep_r_hist = photons_deep_r_hist./(repmat((2*[1:1:(length(r_grid)-1)]-1),numel(hist_grid) - 1,1))';
     end
     
-    if is_calculate_absorption_map & with_air
-        a = find(z_grid == 1);
-        absorption_map = absorption_map(:,:,a:end);
-        z_grid = 0:dz:(max_z-1);
-    end
-    
-    if is_calculate_irradiance & with_air
-        a = find(z_grid == 1);
-        irradiance = irradiance(:,:,a:end);
-        z_grid = 0:dz:(max_z-1);
-    end
     
     if is_calculate_TR
         T = transmit_weight/total_photons
