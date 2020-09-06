@@ -236,8 +236,6 @@ function MonteCarlo_Rect(varargin)
             out_tissue = layer<=0 | layer>=numel(z); 
         end
         
-        %смещение фотонов с границы
-        pos(~is_need_recalculation,:) = pos(~is_need_recalculation,:) + bsxfun(@times, dir(~is_need_recalculation,:), 0.001);
 
         on = false(numel(weight),1);
         for i = 1:numel(z)
@@ -268,6 +266,8 @@ function MonteCarlo_Rect(varargin)
            ylabel('Z, mm');
         end
         end
+        %смещение фотонов с границы
+        pos(~is_need_recalculation,:) = pos(~is_need_recalculation,:) + bsxfun(@times, dir(~is_need_recalculation,:), 0.001);
 
         absorption_weight = absorption_weight + absorb;
         total_absorbed = weight <= min_weight;
