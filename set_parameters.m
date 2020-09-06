@@ -31,6 +31,7 @@ function params = set_default_parameters()
     params.is_show_absorption_map = false;
     params.with_PS = false;
     params.wavelenght = 405;
+    params.with_air = false;
     
     %heterogeneity 
     params.x0 = 5;
