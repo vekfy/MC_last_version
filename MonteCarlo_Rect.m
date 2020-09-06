@@ -237,7 +237,7 @@ function MonteCarlo_Rect(varargin)
         end
         
         %смещение фотонов с границы
-        pos(~is_need_recalculation,:) = pos(~is_need_recalculation,:) + bsxfun(@times, dir(~is_need_recalculation,:), 0.001);
+        %pos(~is_need_recalculation,:) = pos(~is_need_recalculation,:) + bsxfun(@times, dir(~is_need_recalculation,:), 0.001);
 
         on = false(numel(weight),1);
         for i = 1:numel(z)
@@ -255,9 +255,9 @@ function MonteCarlo_Rect(varargin)
         if is_calculate_absorption_map
             
         if use_gpu
-            absorption_map = calculate_absorption_simple_gpu(pos(~out&~on&is_need_recalculation,:), dweight(~out&~on&is_need_recalculation), x_grid, y_grid, z_grid, absorption_map);
+            absorption_map = calculate_absorption_simple_gpu(pos(~out&~on,:), dweight(~out&~on), x_grid, y_grid, z_grid, absorption_map);
         else
-            absorption_map = calculate_absorption_simple(pos(~out&~on&is_need_recalculation,:), dweight(~out&~on&is_need_recalculation), x_grid, y_grid, z_grid, absorption_map);
+            absorption_map = calculate_absorption_simple(pos(~out&~on,:), dweight(~out&~on), x_grid, y_grid, z_grid, absorption_map);
             %absorption_map = calculate_absorption_simple(pos(~out&~on,:), dweight(~out&~on), x_grid, y_grid, z_grid, absorption_map);
         end
         if is_show_absorption_map
