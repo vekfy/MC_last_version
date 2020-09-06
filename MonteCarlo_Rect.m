@@ -11,6 +11,7 @@ function MonteCarlo_Rect(varargin)
     is_complex_detector = params.is_complex_detector;
     is_circle = params.is_circle;
     with_PS  = params.with_PS;
+    with_air = params.with_air;
     is_calculate_absorption_map = params.is_calculate_absorption_map;
     is_show_absorption_map = params.is_show_absorption_map;
     min_weight = params.min_weight;
@@ -177,7 +178,7 @@ function MonteCarlo_Rect(varargin)
         pos = move_photons(pos, dir, layer, mt, use_gpu,ma_PS_conc,with_PS,is_het, is_in_het,mt_het);
 
         [pos, dir, layer, is_need_recalculation] = reflect_photons(pos, pos_previous, dir, layer, z, n, use_gpu);
-
+        %is_need_recalculation - фотоны, которые не пересекли границу
         if is_calculate_irradiance
             
             in = pos(:,1) >= 0 & pos(:,2) >= 0 & pos(:,3) >=0 & pos(:,1) <= x & pos(:,2) <= y & pos(:,3) <= max_z;
@@ -198,7 +199,6 @@ function MonteCarlo_Rect(varargin)
                 colormap jet
             end
         end
-       
         max_deep = max(max_deep, pos(:,3));
         if sum(is_need_recalculation)>0
         dir = photon_scattering(dir, g, layer, is_need_recalculation, use_gpu,is_in_het,g_het);
@@ -221,13 +221,24 @@ function MonteCarlo_Rect(varargin)
         if is_calculate_TR
             transmit_escaped = layer == numel(z);
             transmit_weight = transmit_weight + get_diffuse_weight(pos(transmit_escaped,:), weight(transmit_escaped),source_center,T_radius);
-            
-            reflect_escaped = layer == 0;
+            if with_air
+                reflect_escaped = layer == 1;
+            else
+                reflect_escaped = layer == 0;
+            end
 
             sum_ref = sum_ref + sum(reflect_escaped);
             reflect_weight = reflect_weight + get_diffuse_weight(pos(reflect_escaped,:), weight(reflect_escaped),source_center,R_radius);
         end
+        if with_air
+            out_tissue = layer<=1 | layer>=numel(z); 
+        else
+            out_tissue = layer<=0 | layer>=numel(z); 
+        end
         
+        %смещение фотонов с границы
+        pos(~is_need_recalculation,:) = pos(~is_need_recalculation,:) + bsxfun(@times, dir(~is_need_recalculation,:), 0.001);
+
         on = false(numel(weight),1);
         for i = 1:numel(z)
             on =on + (pos(:,3) == z(i));
