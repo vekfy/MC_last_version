@@ -131,6 +131,9 @@ function MonteCarlo_Rect(varargin)
 			photons_deep_r_hist = gpuArray(photons_deep_r_hist);
         end
     end
+%% 
+detectors_on = params.detectors_on;   %Включение режима детекторов
+detector_matrix = zeros(numel(x_grid),numel(y_grid));
 
     %% Monte-Carlo
 
@@ -218,18 +221,33 @@ function MonteCarlo_Rect(varargin)
             opposite_directed_count = opposite_directed_count + get_directed_weight(is_complex_detector,pos(opposite_escaped,:), dir(opposite_escaped,:), weight(opposite_escaped), n(end-1), n(end), source_center, directed_escape_radius, directed_escape_refracted_angle);
         end
         
-        if is_calculate_TR
-            transmit_escaped = layer == numel(z);
-            transmit_weight = transmit_weight + get_diffuse_weight(pos(transmit_escaped,:), weight(transmit_escaped),source_center,T_radius);
-            if with_air
+        if with_air
                 reflect_escaped = layer == 1;
             else
                 reflect_escaped = layer == 0;
-            end
+        end
+            
+        if is_calculate_TR
+            transmit_escaped = layer == numel(z);
+            transmit_weight = transmit_weight + get_diffuse_weight(pos(transmit_escaped,:), weight(transmit_escaped),source_center,T_radius);
+            
 
             sum_ref = sum_ref + sum(reflect_escaped);
             reflect_weight = reflect_weight + get_diffuse_weight(pos(reflect_escaped,:), weight(reflect_escaped),source_center,R_radius);
         end
+        
+        
+        if detectors_on&(sum(reflect_escaped)~=0)
+            check = reflect_escaped&(pos(:,1)<=x)&(pos(:,2)<=y)&(pos(:,1)>=0)&(pos(:,2)>=0);
+            detector_matrix = detected(detector_matrix,pos(check,:),dir(check,:), weight(check,:),x_grid,y_grid);
+            figure(2)
+           imagesc(x_grid,y_grid, log10(detector_matrix));
+           axis image;
+           xlabel('X, mm');
+           colormap jet
+           ylabel('Z, mm');
+        end
+        
         if with_air
             out_tissue = layer<=1 | layer>=numel(z); 
         else

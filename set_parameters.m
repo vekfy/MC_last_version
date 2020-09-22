@@ -32,6 +32,10 @@ function params = set_default_parameters()
     params.with_PS = false;
     params.wavelenght = 405;
     params.with_air = false;
+  
+    %detectors parameters
+    params.detectors_on = false;
+ 
     
     %heterogeneity 
     params.x0 = 5;
