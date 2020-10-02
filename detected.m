@@ -5,7 +5,7 @@ ix = discretize(pos(:,1), x_grid);
 iy = discretize(pos(:,2), y_grid);
 save('data.mat')
 for i = 1:numel(weight)
-detector_matrix(ix(i),iy(i)) = detector_matrix(ix(i),iy(i)) + weight(i)*dir(i,3);
+detector_matrix(ix(i),iy(i)) = detector_matrix(ix(i),iy(i)) + weight(i);
 end
 
 
