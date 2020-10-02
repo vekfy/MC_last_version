@@ -98,10 +98,6 @@ for var=1:numel(d_PS)
     absorption_map(:,:,z_ps_top:z_ps_bot-1)=absorption_map(:,:,z_ps_top:z_ps_bot-1)*(ma_tot-ma_tis)/ma_tot;
     absorption_map(:,:,z_ps_bot:end)=0;
     
-    %я в коде МК поменяла, что из файла вытаскивается не absorption_map
-    % a map (а то там плохо, если вдруг надо при расчете флуоресценции
-    % считать еще и карту поглощения
-    map = absorption_map;
 
     save(map_blue,'-v7.3');
         
@@ -115,7 +111,6 @@ for var=1:numel(d_PS)
     z_ps_bot=find(z_grid==z(2));
     absorption_map(:,:,z_ps_top:z_ps_bot-1)=absorption_map(:,:,z_ps_top:z_ps_bot-1)*(ma_tot-ma_tis)/ma_tot;
     absorption_map(:,:,z_ps_bot:end)=0;
-    map = absorption_map;
 
     save(map_red,'-v7.3');
 end
