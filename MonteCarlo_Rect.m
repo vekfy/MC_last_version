@@ -97,7 +97,7 @@ function MonteCarlo_Rect(varargin)
 
         x_grid = 0:dx:x; 
         y_grid = 0:dy:y; 
-        z_grid = 0:dx:max_z;
+        z_grid = 0:dz:max_z;
         
         if use_gpu
             x_grid = gpuArray(x_grid);
