@@ -35,7 +35,7 @@ function params = set_default_parameters()
   
     %detectors parameters
     params.detectors_on = false;
- 
+    params.detector_angl = 30*pi/180; 
     
     %heterogeneity 
     params.x0 = 5;
