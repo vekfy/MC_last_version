@@ -12,11 +12,11 @@ function directed_count = get_directed_weight(is_complex_detector,pos, dir, weig
     else
         suspect = [];
     end
-    dir_suspect = dir(suspect, :);
-    angle_incidence = angles_of_incidence(dir_suspect);
-    angle_refraction = angles_of_refraction(angle_incidence, n_in, n_out);
-    
-    suspect = suspect(abs(angle_refraction) <= max_refracted_angle);
+%     dir_suspect = dir(suspect, :);
+%     angle_incidence = angles_of_incidence(dir_suspect);
+%     angle_refraction = angles_of_refraction(angle_incidence, n_in, n_out);
+%     
+%     suspect = suspect(abs(angle_refraction) <= max_refracted_angle);
     
     directed_count = sum(weight(suspect));
 end
