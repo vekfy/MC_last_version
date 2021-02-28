@@ -121,7 +121,7 @@ function MonteCarlo_Rect(varargin)
        
     if is_calculate_histograms
 		%онопюбхрэ!!!!
-        r_grid = 0:d_r_hist:sqrt((x-source_center(1)).^2+(y-source_center(2)).^2); 
+        r_grid = 0:d_r_hist:(x-source_center(1)); 
 		
 		hist_grid = min_z:d_hist:max_z;
         photons_deep_hist = zeros(numel(x_grid) - 1, numel(y_grid) - 1, numel(hist_grid) - 1);
