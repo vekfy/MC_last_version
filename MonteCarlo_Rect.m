@@ -120,7 +120,8 @@ function MonteCarlo_Rect(varargin)
     end
        
     if is_calculate_histograms
-		r_grid = 0:d_r_hist:sqrt((x-source_center(1)).^2+(y-source_center(2)).^2); 
+		%ПОПРАВИТЬ!!!!
+        r_grid = 0:d_r_hist:sqrt((x-source_center(1)).^2+(y-source_center(2)).^2); 
 		
 		hist_grid = min_z:d_hist:max_z;
         photons_deep_hist = zeros(numel(x_grid) - 1, numel(y_grid) - 1, numel(hist_grid) - 1);
@@ -136,6 +137,26 @@ detectors_on = params.detectors_on;   %Включение режима детекторов
 detector_matrix = zeros(numel(x_grid),numel(y_grid));
 detector_angl = params.detector_angl; 
 
+%% ODR regime
+    ODR_on = params.ODR_on;   %Включение режима 
+    detector_is_ring = params.detector_is_ring; % true - Детектирование в кольце, false - в прямоугольнике
+    if detector_is_ring
+        detector_d = params.detector_d;
+        detector_ring_grid = 0:detector_d:sqrt((x-source_center(1)).^2+(y-source_center(2)).^2); 
+        numb_detectors = numel(detector_ring_grid)-1;
+    else
+        dx_detector = params.dx_detector;
+        detector_grid = 0:dx_detector:x; 
+        dy_detector =  params.dy_detector;
+        numb_detectors = x/dx_detector;
+        center_detector = params.center_detector;
+    end
+    angl_detector = params.angl_detector; %Предельный угол детектора
+    
+    det_photons_weights = [];
+    det_photons_angls = [];
+    det_photons_max_depths = [];
+    
     %% Monte-Carlo
 
     opposite_directed_count = 0;
@@ -242,12 +263,20 @@ detector_angl = params.detector_angl;
         if detectors_on&(sum(reflect_escaped)~=0)
             check = reflect_escaped&(pos(:,1)<=x)&(pos(:,2)<=y)&(pos(:,1)>=0)&(pos(:,2)>=0)&((pi - acos(dir(:,3))<=detector_angl));
             detector_matrix = detected(detector_matrix,pos(check,:),dir(check,:), weight(check,:),x_grid,y_grid);
-            figure(2)
-           imagesc(x_grid,y_grid, log10(detector_matrix));
-           axis image;
-           xlabel('X, mm');
-           colormap jet
-           ylabel('Z, mm');
+%             figure(2)
+%             imagesc(x_grid,y_grid, log10(detector_matrix));
+%             axis image;
+%             xlabel('X, mm');
+%             colormap jet
+%             ylabel('Z, mm');
+        end
+        
+        if ODR_on
+            if detector_is_ring
+                [det_photons_weights, det_photons_angls, det_photons_max_depths] = check_detectors_rings(det_photons_weights, det_photons_angls, det_photons_max_depths,pos(reflect_escaped,:),dir(reflect_escaped,:), weight(reflect_escaped),max_deep(reflect_escaped,:),numb_detectors,source_center, detector_ring_grid);
+            else
+                [det_photons_weights, det_photons_angls, det_photons_max_depths] = check_detectors_line(det_photons_weights, det_photons_angls, det_photons_max_depths,pos(reflect_escaped,:),dir(reflect_escaped,:), weight(reflect_escaped),max_deep(reflect_escaped,:),numb_detectors, detector_grid,dy_detector, center_detector);
+            end
         end
         
         if with_air
@@ -287,7 +316,7 @@ detector_angl = params.detector_angl;
         end
         end
         %смещение фотонов с границы
-        pos(~is_need_recalculation,:) = pos(~is_need_recalculation,:) + bsxfun(@times, dir(~is_need_recalculation,:), 0.001);
+        %pos(~is_need_recalculation,:) = pos(~is_need_recalculation,:) + bsxfun(@times, dir(~is_need_recalculation,:), 0.001);
 
         absorption_weight = absorption_weight + absorb;
         total_absorbed = weight <= min_weight;

@@ -35,7 +35,15 @@ function params = set_default_parameters()
   
     %detectors parameters
     params.detectors_on = false;
-    params.detector_angl = 30*pi/180; 
+    params.ODR_on = false;
+    params.detector_angl = pi; 
+    
+    params.detector_is_ring = true;
+    params.detector_d = 1; 
+    params.dx_detector = 1;
+    params.dy_detector = 2;
+    params.center_detector = 5;
+    params.angl_detector = 30*pi/180; 
     
     %heterogeneity 
     params.x0 = 5;
