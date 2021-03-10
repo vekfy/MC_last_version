@@ -165,6 +165,7 @@ detector_angl = params.detector_angl;
     outside_weight = 0;
     absorption_weight = 0;
     transmit_weight = 0;
+    photons_data = [];
 
     wb=waitbar(0,'Time');
     
@@ -262,6 +263,7 @@ detector_angl = params.detector_angl;
         if detectors_on&(sum(reflect_escaped)~=0)
             check = reflect_escaped&(pos(:,1)<=x)&(pos(:,2)<=y)&(pos(:,1)>=0)&(pos(:,2)>=0)&((pi - acos(dir(:,3))<=detector_angl));
             detector_matrix = detected(detector_matrix,pos(check,:),dir(check,:), weight(check,:),x_grid,y_grid);
+            photons_data = [photons_data; pos(check,:), max_deep(check,:)]; 
 %             figure(2)
 %             imagesc(x_grid,y_grid, log10(detector_matrix));
 %             axis image;
