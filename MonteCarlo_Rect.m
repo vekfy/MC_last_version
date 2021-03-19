@@ -120,7 +120,9 @@ function MonteCarlo_Rect(varargin)
     end
        
     if is_calculate_histograms
+
         r_grid = 0:d_r_hist:sqrt((x-source_center(1))^2+(y-source_center(2))^2); 
+
 		
 		hist_grid = min_z:d_hist:max_z;
         photons_deep_hist = zeros(numel(x_grid) - 1, numel(y_grid) - 1, numel(hist_grid) - 1);
@@ -137,11 +139,16 @@ detector_matrix = zeros(numel(x_grid),numel(y_grid));
 detector_angl = params.detector_angl; 
 
 %% ODR regime
-    ODR_on = params.ODR_on;   %Включение режима 
+    ODR_on = params.ODR_on;   %Включение режима
+    custom_ring_grid = params.custom_ring_grid;
     detector_is_ring = params.detector_is_ring; % true - Детектирование в кольце, false - в прямоугольнике
     if detector_is_ring
         detector_d = params.detector_d;
-        detector_ring_grid = 0:detector_d:sqrt((x-source_center(1)).^2+(y-source_center(2)).^2); 
+        if custom_ring_grid
+            detector_ring_grid = params.ring_grid;
+        else
+            detector_ring_grid = 0:detector_d:(x-source_center(1));
+        end
         numb_detectors = numel(detector_ring_grid)-1;
     else
         dx_detector = params.dx_detector;

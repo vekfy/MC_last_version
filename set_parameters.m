@@ -37,7 +37,8 @@ function params = set_default_parameters()
     params.detectors_on = false;
     params.ODR_on = false;
     params.detector_angl = pi; 
-    
+    params.custom_ring_grid = false;
+    params.ring_grid = [0 1 2];
     params.detector_is_ring = true;
     params.detector_d = 1; 
     params.dx_detector = 1;
